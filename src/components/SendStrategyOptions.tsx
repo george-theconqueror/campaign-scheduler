@@ -26,9 +26,6 @@ export default function SendStrategyOptions({
 }: SendStrategyOptionsProps) {
 
 
-
-
-
   const renderStrategyContent = () => {
     switch (currentCampaign.send_strategy.method) {
       case 'static':
@@ -73,7 +70,7 @@ export default function SendStrategyOptions({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="throttle-percentage">Throttle Percentage</Label>
+              <Label htmlFor="throttle-percentage">Percentage of recipients per hour</Label>
               <Select
                 value={currentCampaign.send_strategy.throttle_percentage?.toString() || ''}
                 onValueChange={(value) => {
@@ -83,7 +80,7 @@ export default function SendStrategyOptions({
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select throttle percentage" />
+                  <SelectValue placeholder="Select percentage" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="10">10%</SelectItem>
@@ -120,13 +117,13 @@ export default function SendStrategyOptions({
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="strategy-select">Strategy Type</Label>
+          <Label htmlFor="strategy-select">Send Type</Label>
           <Select value={currentCampaign.send_strategy.method} onValueChange={(value) => resetStrategy(currentCampaign.campaignId, value)}>
             <SelectTrigger id="strategy-select">
               <SelectValue placeholder="Select send strategy" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="static">Static</SelectItem>
+              <SelectItem value="static">Fixed Send Time</SelectItem>
               <SelectItem value="throttled">Gradual</SelectItem>
               <SelectItem value="immediate">Send Now</SelectItem>
             </SelectContent>

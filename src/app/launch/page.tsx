@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -15,6 +15,7 @@ import Link from 'next/link';
 export default function LaunchPage() {
   const context = useContext(CampaignsContext);
   const [segmentGroups, setSegmentGroups] = useState<SegmentGroup[]>([]);
+  const [isPending, startTransition] = useTransition();
   
   if (!context) {
     throw new Error('LaunchPage must be used within CampaignsProvider');
@@ -68,32 +69,34 @@ export default function LaunchPage() {
   }, [setCampaigns]);
 
   const createCampaigns = async () => {
-    try {
-      const response = await fetch('/api/campaigns/create-launch', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          launchName,
-          configurations: tableData,
-          
-        })
-      });
+    startTransition(async () => {
+      try {
+        const response = await fetch('/api/campaigns/create-launch', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            launchName,
+            configurations: tableData,
+            
+          })
+        });
 
-      const result = await response.json();
-      
-      if (result.success) {
-        toast.success(`Successfully created ${result.successfulCampaigns} campaigns!`);
-        console.log('Campaigns created:', result);
-      } else {
-        toast.error(`Error: ${result.message || 'Failed to create campaigns'}`);
-        console.error('Error creating campaigns:', result);
+        const result = await response.json();
+        
+        if (result.success) {
+          toast.success(`Successfully created ${result.successfulCampaigns} campaigns!`);
+          console.log('Campaigns created:', result);
+        } else {
+          toast.error(`Error: ${result.message || 'Failed to create campaigns'}`);
+          console.error('Error creating campaigns:', result);
+        }
+      } catch (error) {
+        toast.error('Error creating campaigns. Please try again.');
+        console.error('Error creating campaigns:', error);
       }
-    } catch (error) {
-      toast.error('Error creating campaigns. Please try again.');
-      console.error('Error creating campaigns:', error);
-    }
+    });
   };
 
   return (
@@ -229,7 +232,7 @@ export default function LaunchPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => removeRow(row.id)}
-                          className="h-8 w-8  text-destructive hover:text-destructive"
+                          className="h-8 w-8 text-destructive hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -253,9 +256,9 @@ export default function LaunchPage() {
             <Button 
               onClick={createCampaigns}
               className="w-full sm:w-auto"
-              disabled={!launchName.trim() || tableData.length === 0}
+              disabled={!launchName.trim() || tableData.length === 0 || isPending}
             >
-              Create Campaigns
+              {isPending ? 'Creating Campaigns...' : 'Create Campaigns'}
             </Button>
             {!launchName.trim() && (
               <p className="text-sm text-muted-foreground mt-2">

@@ -256,9 +256,7 @@ function ScheduleCampaignsContent() {
                           >
                             {campaign.name}
                           </label>
-                          <p className="text-xs text-muted-foreground font-mono">
-                            {campaign.id}
-                          </p>
+                          
                         </div>
                         <div className="flex items-center gap-2">
                           {isSelected && <Button variant="outline" className='text-xs p-2' onClick={() => {setCurrentCampaign(findCampaign(campaign.id))}}>{isCurrent(campaign.id) ?'Selected': 'Select'}</Button>}
